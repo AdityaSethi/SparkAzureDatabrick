@@ -24,14 +24,12 @@ public class App
 
         // Create a Spark configuration
         SparkConf conf = new SparkConf().setAppName("PSDeltaLakeDemoRG");
-        SparkSession spark = SparkSession.builder().config(conf).config("spark.master", "local").getOrCreate();
+        SparkSession spark = SparkSession.builder().config(conf).config("spark.master", "local")
+            .config("fs.azure.account.auth.type.pltaxidatalake1.dfs.core.windows.net", "SharedKey")
+            .config("fs.azure.account.key.pltaxidatalake1.dfs.core.windows.net", azureStorageAccountKey)
+            .getOrCreate();
 
         // // Set Azure Storage configuration
-        // spark.conf().set("fs.azure", "org.apache.hadoop.fs.azure.NativeAzureFileSystem");
-        // spark.conf().set("fs.azure.account.auth.type", "SharedKey");
-        // spark.conf().set("fs.azure.account.key." + azureStorageAccountName, azureStorageAccountKey);
-
-        // spark.conf().set("fs.azure", "org.apache.hadoop.fs.azure.NativeAzureFileSystem");
         spark.conf().set("fs.azure.account.auth.type", "OAuth");
         spark.conf().set("fs.azure.account.oauth.provider.type", "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
         spark.conf().set("fs.azure.account.auth.oauth2.client.id", azureClientId);
@@ -40,18 +38,21 @@ public class App
         spark.conf().set("spark.databricks.delta.preview.enabled", "true");
         // Define the Azure Storage container and file path
         String containerName = "taxidata";
-        String filePath = "/mnt/datalake/Output/YellowTaxis.delta";
+        String filePath = "Output/YellowTaxis.delta";
 
         // Read data from Azure Storage into a DataFrame
-        String azurePath = "abfss://" + containerName + "@" + azureStorageAccountName + ".dfs.core.windows.net/" +filePath;
+        String azurePath = "abfss://" + containerName + "@" + azureStorageAccountName + ".dfs.core.windows.net/" + filePath;
         
-        Dataset<Row> data = spark.read().format("delta").load(azurePath);
-        // DeltaTable deltaTable = DeltaTable.forPath(spark, azurePath);
-        // Dataset<Row> data = deltaTable.toDF();
-        // Perform operations on the data (e.g., show the content)
+        System.out.println("**********************");
+        System.out.println(azurePath);
+        System.out.println("**********************");
+
+        Dataset<Row> data = spark.read().format("delta").load(azurePath).where("VendorId=3");
+        
         data.show();
 
         // Stop the Spark session
         spark.stop();
+        
     }
 }

@@ -28,37 +28,45 @@
     <dependency>
         <groupId>org.apache.spark</groupId>
         <artifactId>spark-core_2.12</artifactId>
-        <version>3.5.0</version> <!-- Use the appropriate Spark version -->
+        <version>3.1.2</version> <!-- Use the appropriate Spark version -->
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-    
-    <dependency>
-        <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.12</artifactId>
-        <version>3.0.1</version> 
-    </dependency>
-    -->
     <dependency>
         <groupId>io.delta</groupId>
         <artifactId>delta-core_2.12</artifactId>
         <version>1.0.0</version> <!-- Use the appropriate Delta Lake version -->
     </dependency>
-<dependency>
-    <groupId>org.apache.spark</groupId>
-    <artifactId>spark-sql_2.12</artifactId>
-    <version>3.5.0</version>
-    <scope>provided</scope>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_2.12</artifactId>
+      <version>3.1.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-azure</artifactId>
+      <version>3.2.0</version> <!-- Use the appropriate Hadoop Azure version -->
+    </dependency>
+    <dependency> 
+      <groupId>org.antlr</groupId> 
+      <artifactId>antlr4</artifactId> 
+      <version>4.13.1</version> 
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.32</version> <!-- Use the latest version -->
+    </dependency>
+    <dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.12.5</version> <!-- Use the appropriate version -->
 </dependency>
 <dependency>
-    <groupId>org.apache.hadoop</groupId>
-    <artifactId>hadoop-azure</artifactId>
-    <version>3.2.0</version> <!-- Use the appropriate Hadoop Azure version -->
-</dependency>
-<dependency> 
-  <groupId>org.antlr</groupId> 
-  <artifactId>antlr4</artifactId> 
-  <version>4.13.1</version> 
-</dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.32</version> <!-- Use the same version as slf4j-api -->
+        </dependency>
+    
   </dependencies>
 
   <build>
