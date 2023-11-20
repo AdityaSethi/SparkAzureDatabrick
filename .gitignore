@@ -1,0 +1,19 @@
+# Common IDE settings files etc to ignore
+.idea
+*.iws
+*.iml
+*.ipr
+.settings
+.vs
+local.properties
+.user
+.gradle
+
+# Logs and databases, generally shouldn't be committed
+*.log
+*.sqlite
+
+# Build Artifacts
+/out/
+/target/
+/build/

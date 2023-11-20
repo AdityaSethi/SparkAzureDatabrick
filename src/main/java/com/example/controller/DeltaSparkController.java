@@ -1,11 +1,10 @@
 package com.example.controller;
 
 
+import com.example.model.SparkClientData;
 import com.example.services.ReadDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,9 +19,12 @@ public class DeltaSparkController {
     @Autowired
     ReadDataService readDataService;
 
-    @RequestMapping(value = "/read/taxidata", method = RequestMethod.GET)
-    public List<String> getTaxiData() {
-        return readDataService.getDataFromContainer();
+    @RequestMapping(value = "/read/taxidata", method = RequestMethod.POST)
+    @ResponseBody
+    public List<String> getTaxiData(@RequestBody SparkClientData input) {
+        System.out.println("/read/taxidata calling endpoint.........");
+        System.out.println("Input is :- "+input);
+        return readDataService.getDataFromContainer(input);
     }
 
     @RequestMapping(value = "/test")

@@ -1,5 +1,6 @@
 package com.example.services;
 
+import com.example.model.SparkClientData;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -14,18 +15,16 @@ public class ReadDataService {
     public ReadDataService() {
     }
 
-    public List<String> getDataFromContainer() {
-        System.out.println("Hello World New!");
-        System.setProperty("hadoop.home.dir", "C:\\Users\\Asus\\Downloads\\hadoop-common-2.2.0-bin-master\\hadoop-common-2.2.0-bin-master");
+    public SparkSession createSparkSession(SparkClientData sparkClientData) {
+        String azureAppName = sparkClientData.getAzureAppName(); //PSDeltaLakeDemoRG
+        String azureClientId = sparkClientData.getAzureClientId();//"b33ce05c-63e0-42cb-9d75-6efe5a0d86df";
+        String azureClientSecret = sparkClientData.getAzureClientSecret();//"n+NZtxvNMmEAzq8sgnGGFz0if/0ZXQPZrmwqHjj3UZE=";
 
-        // Set your Azure Storage account name and key
-        String azureClientId = "b33ce05c-63e0-42cb-9d75-6efe5a0d86df";
-        String azureClientSecret = "n+NZtxvNMmEAzq8sgnGGFz0if/0ZXQPZrmwqHjj3UZE=";
-        String azureStorageAccountName = "pltaxidatalake1";
-        String azureStorageAccountKey = "tt92YNKNv9SpcUnvjSHIsAdERGlS03wZnYJqZac2FklsT1vcUoG6T08+OSDC89YIWzTA/WNHLLo1+AStIj3KEQ==";
+        String azureStorageAccountKey = sparkClientData.getAzureStorageAccountKey();//"tt92YNKNv9SpcUnvjSHIsAdERGlS03wZnYJqZac2FklsT1vcUoG6T08+OSDC89YIWzTA/WNHLLo1+AStIj3KEQ==";
+        String tenantId = sparkClientData.getAzureTenantId();//6a310e33-5293-4125-87b1-0c69a570347f
 
         // Create a Spark configuration
-        SparkConf conf = new SparkConf().setAppName("PSDeltaLakeDemoRG");
+        SparkConf conf = new SparkConf().setAppName(azureAppName);
         SparkSession spark = SparkSession.builder().config(conf).config("spark.master", "local")
                 .config("fs.azure.account.auth.type.pltaxidatalake1.dfs.core.windows.net", "SharedKey")
                 .config("fs.azure.account.key.pltaxidatalake1.dfs.core.windows.net", azureStorageAccountKey)
@@ -36,20 +35,39 @@ public class ReadDataService {
         spark.conf().set("fs.azure.account.oauth.provider.type", "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
         spark.conf().set("fs.azure.account.auth.oauth2.client.id", azureClientId);
         spark.conf().set("fs.azure.account.auth.oauth2.client.secret", azureClientSecret);
-        spark.conf().set("fs.azure.account.auth.oauth2.client.endpoint", "https://login.microsoftonline.com/6a310e33-5293-4125-87b1-0c69a570347f/oauth2/token");
+        spark.conf().set("fs.azure.account.auth.oauth2.client.endpoint", "https://login.microsoftonline.com/" + tenantId + "/oauth2/token");
         spark.conf().set("spark.databricks.delta.preview.enabled", "true");
+
+        return spark;
+    }
+
+    public List<String> getDataFromContainer(SparkClientData sparkClientData) {
+        System.out.println("Hello World New!");
+        System.setProperty("hadoop.home.dir", "C:\\Users\\Asus\\Downloads\\hadoop-common-2.2.0-bin-master\\hadoop-common-2.2.0-bin-master");
+
+        String azureStorageAccountName = sparkClientData.getAzureStorageAccountName();//"pltaxidatalake1";
+
+        SparkSession spark = createSparkSession(sparkClientData);
+
+
         // Define the Azure Storage container and file path
-        String containerName = "taxidata";
-        String filePath = "Output/YellowTaxis.delta";
+        String containerName = sparkClientData.getAzureContainerName();//"taxidata";
+        String filePath = sparkClientData.getAzureFilePath();//"Output";
+        String fileName = sparkClientData.getAzureFileName();//"YellowTaxis.delta";
+        String conditionId = sparkClientData.getAzureConditionId();//"VendorId=4";
 
         // Read data from Azure Storage into a DataFrame
-        String azurePath = "abfss://" + containerName + "@" + azureStorageAccountName + ".dfs.core.windows.net/" + filePath;
+        String azurePath = "abfss://" + containerName + "@" + azureStorageAccountName + ".dfs.core.windows.net/" + filePath + "/" + fileName;
 
         System.out.println("**********************");
         System.out.println(azurePath);
         System.out.println("**********************");
 
-        Dataset<Row> dataset = spark.read().format("delta").load(azurePath).where("VendorId=4");
+        Dataset<Row> dataset;
+        if (!conditionId.isEmpty())
+            dataset = spark.read().format("delta").load(azurePath).where(conditionId);
+        else
+            dataset = spark.read().format("delta").load(azurePath);
 
         dataset.show();
 
