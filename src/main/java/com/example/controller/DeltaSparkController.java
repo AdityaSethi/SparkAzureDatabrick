@@ -23,7 +23,7 @@ public class DeltaSparkController {
 
     @RequestMapping(value = "/create/sparksession", method = RequestMethod.POST)
     @ResponseBody
-    public SparkSession getSparkSession(@RequestBody SparkClientData input) {
+    public String getSparkSession(@RequestBody SparkClientData input) {
         System.out.println("/create/sparksession calling endpoint.........");
         System.out.println("Input param :- "+input);
         return readDataService.createSparkSession(input);

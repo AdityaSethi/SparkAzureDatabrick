@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class SparkClientData {
+    String sparkSessionUUID;
     String azureAppName;
     String azureClientId;
     String azureClientSecret;
@@ -13,7 +14,8 @@ public class SparkClientData {
     @Override
     public String toString() {
         return "SparkClientData{" +
-                "azureAppName='" + azureAppName + '\'' +
+                "sparkSessionUUID='" + sparkSessionUUID + '\'' +
+                ", azureAppName='" + azureAppName + '\'' +
                 ", azureClientId='" + azureClientId + '\'' +
                 ", azureClientSecret='" + azureClientSecret + '\'' +
                 ", azureStorageAccountKey='" + azureStorageAccountKey + '\'' +

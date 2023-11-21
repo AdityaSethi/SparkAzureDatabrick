@@ -8,16 +8,22 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReadDataService {
+    Map<String, SparkSession> localSessionMap = new HashMap<>();
 
     public ReadDataService() {
         System.setProperty("hadoop.home.dir", "C:\\Users\\Asus\\Downloads\\hadoop-common-2.2.0-bin-master\\hadoop-common-2.2.0-bin-master");
     }
 
-    public SparkSession createSparkSession(SparkClientData sparkClientData) {
+    public String createSparkSession(SparkClientData sparkClientData) {
+        if (sparkClientData.getSparkSessionUUID() != null && localSessionMap.containsKey(sparkClientData.getSparkSessionUUID()))
+            return "Spark session for given config is already created with UUID : " + sparkClientData.getSparkSessionUUID();
         String azureAppName = sparkClientData.getAzureAppName(); //PSDeltaLakeDemoRG
         String azureClientId = sparkClientData.getAzureClientId();//"b33ce05c-63e0-42cb-9d75-6efe5a0d86df";
         String azureClientSecret = sparkClientData.getAzureClientSecret();//"n+NZtxvNMmEAzq8sgnGGFz0if/0ZXQPZrmwqHjj3UZE=";
@@ -40,8 +46,11 @@ public class ReadDataService {
         spark.conf().set("fs.azure.account.auth.oauth2.client.endpoint", "https://login.microsoftonline.com/" + tenantId + "/oauth2/token");
         spark.conf().set("spark.databricks.delta.preview.enabled", "true");
 
-        System.out.println("spark session ******** : "+spark);
-        return spark;
+        System.out.println("New spark session created ******** : " + spark.sessionUUID());
+        String uuid = spark.sessionUUID();
+        localSessionMap.put(uuid, spark);
+
+        return "Spark session newly created with UUID : " + uuid;
     }
 
     public List<String> getDataFromContainer(SparkReadInput sparkReadInput) {
@@ -60,11 +69,20 @@ public class ReadDataService {
         System.out.println(azurePath);
         System.out.println("**********************");
 
+        if (!localSessionMap.containsKey(sparkReadInput.getSparkSessionUUID()))
+            return new ArrayList<String>() {
+                {
+                    add("Please create first valid spark session");
+                }
+            };
+
+        SparkSession sparkSession = localSessionMap.get(sparkReadInput.getSparkSessionUUID());
+
         Dataset<Row> dataset;
         if (!conditionId.isEmpty())
-            dataset = sparkReadInput.getSparkSession().read().format("delta").load(azurePath).where(conditionId);
+            dataset = sparkSession.read().format("delta").load(azurePath).where(conditionId);
         else
-            dataset = sparkReadInput.getSparkSession().read().format("delta").load(azurePath);
+            dataset = sparkSession.read().format("delta").load(azurePath);
 
         dataset.show();
 
