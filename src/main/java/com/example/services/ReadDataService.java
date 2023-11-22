@@ -51,7 +51,7 @@ public class ReadDataService {
         String uuid = spark.sessionUUID();
         localSessionMap.put(uuid, spark);
 
-        return "Spark session newly created with UUID : " + uuid;
+        return "Spark session newly created with UUID :" + uuid;
     }
 
     public List<String> getDataFromContainer(SparkReadInput sparkReadInput) {
