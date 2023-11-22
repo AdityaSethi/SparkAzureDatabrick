@@ -37,6 +37,14 @@ public class DeltaSparkController {
         return readDataService.getDataFromContainer(input);
     }
 
+    @RequestMapping(value = "/write/taxidata", method = RequestMethod.POST)
+    @ResponseBody
+    public List<String> putTaxiData(@RequestBody SparkReadInput input) {
+        System.out.println("/write/taxidata calling endpoint.........");
+        System.out.println("Input param :- "+input);
+        return readDataService.getDataFromContainer(input);
+    }
+
     @RequestMapping(value = "/test")
     public String apiTest() {
         return "sagar api testing.......";

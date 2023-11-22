@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Service
 public class ReadDataService {
-    Map<String, SparkSession> localSessionMap = new HashMap<>();
+    static Map<String, SparkSession> localSessionMap = new HashMap<>();
 
     public ReadDataService() {
         System.setProperty("hadoop.home.dir", "C:\\Users\\Asus\\Downloads\\hadoop-common-2.2.0-bin-master\\hadoop-common-2.2.0-bin-master");
@@ -23,10 +23,11 @@ public class ReadDataService {
 
     public String createSparkSession(SparkClientData sparkClientData) {
         if (sparkClientData.getSparkSessionUUID() != null && localSessionMap.containsKey(sparkClientData.getSparkSessionUUID()))
-            return "Spark session for given config is already created with UUID : " + sparkClientData.getSparkSessionUUID();
+            return "Spark session for given config is already created with UUID :" + sparkClientData.getSparkSessionUUID();
         String azureAppName = sparkClientData.getAzureAppName(); //PSDeltaLakeDemoRG
         String azureClientId = sparkClientData.getAzureClientId();//"b33ce05c-63e0-42cb-9d75-6efe5a0d86df";
         String azureClientSecret = sparkClientData.getAzureClientSecret();//"n+NZtxvNMmEAzq8sgnGGFz0if/0ZXQPZrmwqHjj3UZE=";
+        String azureStorageAccountName = sparkClientData.getAzureStorageAccountName();//"pltaxidatalake1";
 
         String azureStorageAccountKey = sparkClientData.getAzureStorageAccountKey();//"tt92YNKNv9SpcUnvjSHIsAdERGlS03wZnYJqZac2FklsT1vcUoG6T08+OSDC89YIWzTA/WNHLLo1+AStIj3KEQ==";
         String tenantId = sparkClientData.getAzureTenantId();//6a310e33-5293-4125-87b1-0c69a570347f
@@ -34,8 +35,8 @@ public class ReadDataService {
         // Create a Spark configuration
         SparkConf conf = new SparkConf().setAppName(azureAppName);
         SparkSession spark = SparkSession.builder().config(conf).config("spark.master", "local")
-                .config("fs.azure.account.auth.type.pltaxidatalake1.dfs.core.windows.net", "SharedKey")
-                .config("fs.azure.account.key.pltaxidatalake1.dfs.core.windows.net", azureStorageAccountKey)
+                .config("fs.azure.account.auth.type."+azureStorageAccountName+".dfs.core.windows.net", "SharedKey")
+                .config("fs.azure.account.key."+azureStorageAccountName+".dfs.core.windows.net", azureStorageAccountKey)
                 .getOrCreate();
 
         // // Set Azure Storage configuration
@@ -46,7 +47,7 @@ public class ReadDataService {
         spark.conf().set("fs.azure.account.auth.oauth2.client.endpoint", "https://login.microsoftonline.com/" + tenantId + "/oauth2/token");
         spark.conf().set("spark.databricks.delta.preview.enabled", "true");
 
-        System.out.println("New spark session created ******** : " + spark.sessionUUID());
+        System.out.println("New spark session created ******** :" + spark.sessionUUID());
         String uuid = spark.sessionUUID();
         localSessionMap.put(uuid, spark);
 

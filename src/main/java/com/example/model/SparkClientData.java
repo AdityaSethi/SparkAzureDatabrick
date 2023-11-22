@@ -10,6 +10,7 @@ public class SparkClientData {
     String azureClientSecret;
     String azureStorageAccountKey;
     String azureTenantId;
+    String azureStorageAccountName;
 
     @Override
     public String toString() {
