@@ -3,8 +3,11 @@ package com.example.controller;
 
 import com.example.model.SparkClientData;
 import com.example.model.SparkReadInput;
+import com.example.model.SparkWriteInput;
 import com.example.services.ReadDataService;
+import com.example.services.WriteDataService;
 import org.apache.spark.sql.SparkSession;
+import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,9 @@ public class DeltaSparkController {
 
     @Autowired
     ReadDataService readDataService;
+
+    @Autowired
+    WriteDataService writeDataService;
 
     @RequestMapping(value = "/create/sparksession", method = RequestMethod.POST)
     @ResponseBody
@@ -39,10 +45,10 @@ public class DeltaSparkController {
 
     @RequestMapping(value = "/write/taxidata", method = RequestMethod.POST)
     @ResponseBody
-    public List<String> putTaxiData(@RequestBody SparkReadInput input) {
+    public String putTaxiData(@RequestBody SparkWriteInput input) {
         System.out.println("/write/taxidata calling endpoint.........");
         System.out.println("Input param :- "+input);
-        return readDataService.getDataFromContainer(input);
+        return writeDataService.writeData(input);
     }
 
     @RequestMapping(value = "/test")
