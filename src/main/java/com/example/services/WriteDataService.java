@@ -20,11 +20,11 @@ public class WriteDataService {
 
     public String writeData(SparkWriteInput sparkWriteInput) {
         // Define the Azure Storage container and file path
-        String containerName = sparkWriteInput.getAzureContainerName();//"taxidata";
-        String filePath = sparkWriteInput.getAzureFilePath();//"Output";
-        String fileName = sparkWriteInput.getAzureFileName();//"YellowTaxisNew.delta";
-        String conditionId = sparkWriteInput.getAzureConditionId();//"VendorId=4";
-        String azureStorageAccountName = sparkWriteInput.getAzureStorageAccountName();//"pltaxidatalake1";
+        String containerName = sparkWriteInput.getAzureContainerName();
+        String filePath = sparkWriteInput.getAzureFilePath();
+        String fileName = sparkWriteInput.getAzureFileName();
+        String conditionId = sparkWriteInput.getAzureConditionId();
+        String azureStorageAccountName = sparkWriteInput.getAzureStorageAccountName();
 
 
         // Read data from Azure Storage into a DataFrame
