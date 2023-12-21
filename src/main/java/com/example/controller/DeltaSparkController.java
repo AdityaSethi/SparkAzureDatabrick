@@ -1,6 +1,8 @@
 package com.example.controller;
 
 
+import com.azure.security.keyvault.secrets.SecretClient;
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import com.example.model.SparkClientData;
 import com.example.model.SparkReadInput;
 import com.example.model.SparkWriteInput;
@@ -22,6 +24,9 @@ public class DeltaSparkController {
     }
 
     @Autowired
+    SecretClient secretClient;
+
+    @Autowired
     ReadDataService readDataService;
 
     @Autowired
@@ -30,8 +35,16 @@ public class DeltaSparkController {
     @RequestMapping(value = "/create/sparksession", method = RequestMethod.POST)
     @ResponseBody
     public String getSparkSession(@RequestBody SparkClientData input) {
+
+        secretClient.setSecret(new KeyVaultSecret("testSecret", "testValue"));
+        System.out.println(secretClient);
+        KeyVaultSecret clientId = secretClient.getSecret("clientIdNew");
+        KeyVaultSecret clientSecret = secretClient.getSecret("clientSecretNew");
+        KeyVaultSecret tenantId = secretClient.getSecret("tenantId");
         System.out.println("/create/sparksession calling endpoint.........");
-        System.out.println("Input param :- "+input);
+        input.setAzureClientId(clientId.getValue());
+        input.setAzureClientSecret(clientSecret.getValue());
+        input.setAzureTenantId(tenantId.getValue());
         return readDataService.createSparkSession(input);
     }
 

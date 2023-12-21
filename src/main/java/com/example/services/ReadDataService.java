@@ -6,12 +6,21 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.azure.core.util.polling.SyncPoller;
+import com.azure.identity.DefaultAzureCredentialBuilder;
+
+import com.azure.security.keyvault.secrets.SecretClient;
+import com.azure.security.keyvault.secrets.SecretClientBuilder;
+import com.azure.security.keyvault.secrets.models.DeletedSecret;
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 
 @Service
 public class ReadDataService {
@@ -22,11 +31,12 @@ public class ReadDataService {
     }
 
     public String createSparkSession(SparkClientData sparkClientData) {
+
         if (sparkClientData.getSparkSessionUUID() != null && localSessionMap.containsKey(sparkClientData.getSparkSessionUUID()))
             return "Spark session for given config is already created with UUID :" + sparkClientData.getSparkSessionUUID();
         String azureAppName = sparkClientData.getAzureAppName();
         String azureClientId = sparkClientData.getAzureClientId();
-        String azureClientSecret = sparkClientData.getAzureClientSecret();
+        String azureClientSecret =  sparkClientData.getAzureClientSecret();
         String azureStorageAccountName = sparkClientData.getAzureStorageAccountName();
 
         String azureStorageAccountKey = sparkClientData.getAzureStorageAccountKey();
